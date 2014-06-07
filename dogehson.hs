@@ -1,32 +1,64 @@
+import Control.Monad
 import Text.ParserCombinators.Parsec hiding (spaces)
+import Text.ParserCombinators.Parsec.Language (javaStyle)
+import qualified Text.ParserCombinators.Parsec.Token as P
 
 type Dict = [(String, Dson)]
-type Wut = Maybe Bool
 
-data Dson = Dson Dict | Array [Dson] | String String | Int Int | Bool Wut
+data Dson = Dict Dict | Array [Dson] | String String | Number Int | Yes | No | Empty
     deriving Show
 
-stringToDsonBool :: String -> Dson
-stringToDsonBool "yes" = Bool $ Just True
-stringToDsonBool "no" = Bool $ Just False
-stringToDsonBool "empty" = Bool Nothing
+lexer = P.makeTokenParser javaStyle
+symbol = P.symbol lexer
+lexeme = P.lexeme lexer
+
+spaces = skipMany1 space
+
+anyNotBackslashComilla :: Parser Char
+anyNotBackslashComilla = noneOf "\""
+
 
 dsonString :: Parser Dson
 dsonString = do
      char '"'
-     x <- many (noneOf "\"")
+     x <- many anyNotBackslashComilla
      char '"'
      return $ String x
 
 dsonInt :: Parser Dson
-dsonInt = do
-     x <- many1 digit
-     return $ (Int . read) x
+dsonInt = liftM (Number . read) $ many1 digit
 
 dsonBool :: Parser Dson
-dsonBool = do
-     x <- string "yes" <|> string "no" <|> string "empty"
-     return $ stringToDsonBool x
+dsonBool = try (string "yes" >> return Yes) <|>
+           try (string "no" >> return No) <|>
+               (string "empty" >> return Empty)
 
-dsonValue  :: Parser Dson
-dsonValue = dsonBool <|> dsonInt <|> dsonString
+dsonValue :: Parser Dson
+dsonValue = lexeme (try dsonArray <|> try dsonDict <|> try dsonBool <|> try dsonInt <|> dsonString)
+
+dsonArray :: Parser Dson
+dsonArray = do
+    symbol "so"
+    vals <- sepBy dsonValue dsonArraySep
+    symbol "many"
+    return $ Array vals
+  where dsonArraySep = try (symbol "also") <|> (symbol "and")
+
+dsonDict :: Parser Dson
+dsonDict = do
+    symbol "such"
+    vals <- sepBy keyValue dsonDictSep
+    symbol "wow"
+    return $ Dict vals
+  where dsonDictSep = lexeme $ oneOf ".,!?"
+        keyValue = do
+            key <- dsonKey
+            symbol "is"
+            val <- dsonValue
+            return (key, val)
+
+        dsonKey = lexeme $ do
+            char '"'
+            v <- many (noneOf "\"")
+            char '"'
+            return v

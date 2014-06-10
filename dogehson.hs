@@ -1,12 +1,14 @@
+import Control.Applicative
 import Control.Monad
-import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Language (javaStyle)
-import qualified Text.ParserCombinators.Parsec.Token as P
+import Text.Parsec hiding (Empty, many, optional, (<|>))
+import Text.Parsec.String (Parser)
+import Text.Parsec.Language (javaStyle)
+import qualified Text.Parsec.Token as P
 
 type Dict = [(String, Dson)]
 
 data Dson = Dict Dict | Array [Dson] | String String | Number Double | Yes | No | Empty
-    deriving Show
+    deriving (Show, Eq)
 
 lexer = P.makeTokenParser javaStyle
 symbol = P.symbol lexer
@@ -42,14 +44,18 @@ dsonArray = do
 dsonDict :: Parser Dson
 dsonDict = do
     symbol "such"
-    vals <- sepBy keyValue dsonDictSep
+    vals <- keyValue `sepBy` dsonDictSep
     symbol "wow"
     return $ Dict vals
   where dsonDictSep = oneOf ".,!?"
+        dsonKey = stringLiteral
         keyValue = do
             key <- dsonKey
             symbol "is"
             val <- dsonValue
             return (key, val)
 
-        dsonKey = stringLiteral
+dsonDIct2 :: Parser [(String, Dson)]
+dsonDIct2 = symbol "such" *> (kvPairs `sepBy` dsonSep) <* symbol "wow"
+  where kvPairs = (,) <$> stringLiteral <*> (symbol "is" *> dsonValue)
+        dsonSep = spaces *> oneOf ".,!?" <* spaces

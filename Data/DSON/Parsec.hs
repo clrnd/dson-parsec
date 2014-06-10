@@ -4,7 +4,8 @@ module Data.DOSN.Parsec (
     ) where
 
 import Control.Applicative
-import Text.Parsec (sepBy, try, oneOf, char, spaces, parseTest)
+import Data.Char (isOctDigit)
+import Text.Parsec (satisfy, sepBy, try, oneOf, char, spaces, parseTest)
 import Text.Parsec.String (Parser)
 import Text.Parsec.Language (emptyDef)
 import qualified Text.Parsec.Token as P
@@ -22,12 +23,19 @@ dsonString :: Parser Dson
 dsonString = DSString <$> stringLiteral
 
 dsonInt :: Parser Dson
-dsonInt = pure (DSNumber . (either fromInteger id)) <*> naturalOrFloat
+dsonInt = pure (DSNumber . either fromInteger id) <*> naturalOrFloat
 
 dsonInt2 :: Parser Dson
 dsonInt2 = DSNumber <$> number
     where number = (*) <$> factor <*> float
           factor = (char '-' *> pure (-1)) <|> pure 1
+
+
+octalNumber :: Parser String
+octalNumber = (++) <$> (some octDigit <*> symbol "." <*> some octDigit)
+
+octDigit :: Parser Char
+octDigit = satisfy isOctDigit
 
 dsonBool :: Parser Dson
 dsonBool =     (symbol "yes"   *> pure Yes)
@@ -38,7 +46,7 @@ dsonValue :: Parser Dson
 dsonValue = try dsonArray <|> try dsonDict <|> try dsonBool <|> try dsonInt <|> dsonString
 
 dsonArray = DSArray <$> (symbol "so" *> dsonValue `sepBy` arraySep <* symbol "many")
-    where arraySep = try (symbol "also") <|> (symbol "and")
+    where arraySep = try (symbol "also") <|> symbol "and"
 
 dsonDict :: Parser Dson
 dsonDict = DSDict <$> (symbol "such" *> (kvPairs `sepBy` dictSep) <* symbol "wow")

@@ -3,14 +3,14 @@ dson-parsec
 
 <img src="doge-dson-parsec.png" />
 
-### How much?
+## How much?
 
 [DSON](dogeon.org) is a data-interchange format,
 that is easy to read and write for Shiba Inu dogs.
 It is easy for machines to parse and generate.
 It's extremely fast (faster than C) and very nice.
 
-## Many wow
+### Many wow
 
 dson-parsec is the Haskell parser of choice.
 It's used in several high end industries with

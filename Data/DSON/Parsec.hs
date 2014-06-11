@@ -5,6 +5,7 @@ module Data.DOSN.Parsec (
 
 import Control.Applicative
 import Data.Char (isOctDigit)
+import Data.Dson.Octal (octalToDouble)
 import Text.Parsec (satisfy, sepBy, try, oneOf, char, spaces, parseTest)
 import Text.Parsec.String (Parser)
 import Text.Parsec.Language (emptyDef)
@@ -22,20 +23,21 @@ float = P.float lexer
 dsonString :: Parser Dson
 dsonString = DSString <$> stringLiteral
 
+factor :: Parser Double
+factor = (char '-' *> pure (-1)) <|> (char '+' *> pure 1) <|> pure 1
+
 dsonInt :: Parser Dson
-dsonInt = pure (DSNumber . either fromInteger id) <*> naturalOrFloat
+dsonInt = DSNumber <$> number
+    where number = (*) <$> factor <*> octal
 
-dsonInt2 :: Parser Dson
-dsonInt2 = DSNumber <$> number
-    where number = (*) <$> factor <*> float
-          factor = (char '-' *> pure (-1)) <|> pure 1
+octal = octalToDouble <$> octalParts
 
-
-octalNumber :: Parser String
-octalNumber = (++) <$> (some octDigit <*> symbol "." <*> some octDigit)
-
-octDigit :: Parser Char
-octDigit = satisfy isOctDigit
+octalParts :: Parser (String, Maybe String, Maybe (Double, String))
+octalParts = (,,) <$> some octDigit <*> optional octalDecimals <*> optional octalExponent
+    where octDigit = satisfy isOctDigit
+          octalDecimals = symbol "." *> some octDigit
+          octalExponent = (,) <$> (veryVERY *> factor) <*> some octDigit
+          veryVERY = symbol "very" <|> symbol "VERY"
 
 dsonBool :: Parser Dson
 dsonBool =     (symbol "yes"   *> pure Yes)

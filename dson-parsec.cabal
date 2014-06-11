@@ -16,7 +16,10 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 library
-  exposed-modules:   Data.DSON.Parsec
+  exposed-modules:   Data.Dson,
+                     Data.Dson.Parsec,
+                     Data.Dson.Octal,
+                     Data.Dson.Lexer
   -- other-modules:       
   build-depends:     base ==4.6.*
                    , parsec >=3.1

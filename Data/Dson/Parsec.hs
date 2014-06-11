@@ -1,43 +1,23 @@
-module Data.DOSN.Parsec (
+module Data.Dson.Parsec (
     Dson(..),
     dsonTop
     ) where
 
+import Data.Dson.Octal
+import Data.Dson.Lexer
+
 import Control.Applicative
-import Data.Char (isOctDigit)
-import Data.Dson.Octal (octalToDouble)
-import Text.Parsec (satisfy, sepBy, try, oneOf, char, spaces, parseTest)
+import Text.Parsec (sepBy, try, oneOf, spaces, parseTest)
 import Text.Parsec.String (Parser)
-import Text.Parsec.Language (emptyDef)
-import qualified Text.Parsec.Token as P
 
 data Dson = DSDict [(String, Dson)] | DSArray [Dson] | DSString String | DSNumber Double | Yes | No | Empty
     deriving (Show, Eq)
 
-lexer = P.makeTokenParser emptyDef
-symbol = P.symbol lexer
-stringLiteral = P.stringLiteral lexer
-naturalOrFloat = P.naturalOrFloat lexer
-float = P.float lexer
-
 dsonString :: Parser Dson
 dsonString = DSString <$> stringLiteral
 
-factor :: Parser Double
-factor = (char '-' *> pure (-1)) <|> (char '+' *> pure 1) <|> pure 1
-
 dsonInt :: Parser Dson
-dsonInt = DSNumber <$> number
-    where number = (*) <$> factor <*> octal <* spaces
-
-octal = octalToDouble <$> octalParts
-
-octalParts :: Parser (String, Maybe String, Maybe (Double, String))
-octalParts = (,,) <$> some octDigit <*> optional octalDecimals <*> optional octalExponent
-    where octDigit = satisfy isOctDigit
-          octalDecimals = symbol "." *> some octDigit
-          octalExponent = (,) <$> (veryVERY *> factor) <*> some octDigit
-          veryVERY = symbol "very" <|> symbol "VERY"
+dsonInt = DSNumber <$> octal
 
 dsonBool :: Parser Dson
 dsonBool =     (symbol "yes"   *> pure Yes)

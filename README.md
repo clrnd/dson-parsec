@@ -8,6 +8,7 @@ dson-parsec
 [DSON](dogeon.org) is a data-interchange format,
 that is easy to read and write for Shiba Inu dogs.
 It is easy for machines to parse and generate.
+
 It's extremely fast (faster than C) and very nice.
 
 ### Many wow
@@ -24,7 +25,7 @@ legible and easy debugging.
 ### Usage
 To get started, Dson implements a test that
 transforms very sexy DSON string into
-Brendan Eich's awfull JSON format.
+Brendan Eich's awful JSON format.
 
 ```haskell
 Prelude> import Data.Dson

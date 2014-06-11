@@ -36,4 +36,4 @@ dsonDict = DSDict <$> (symbol "such" *> (kvPairs `sepBy` dictSep) <* symbol "wow
           dictSep = oneOf ".,!?" <* spaces
 
 dsonTop :: Parser Dson
-dsonTop = try dsonDict <|> dsonArray
+dsonTop = dsonDict

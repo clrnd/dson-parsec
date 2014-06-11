@@ -28,7 +28,7 @@ factor = (char '-' *> pure (-1)) <|> (char '+' *> pure 1) <|> pure 1
 
 dsonInt :: Parser Dson
 dsonInt = DSNumber <$> number
-    where number = (*) <$> factor <*> octal
+    where number = (*) <$> factor <*> octal <* spaces
 
 octal = octalToDouble <$> octalParts
 

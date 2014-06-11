@@ -18,6 +18,7 @@ cabal-version:       >=1.8
 library
   exposed-modules:   Data.Dson,
                      Data.Dson.Parsec,
+                     Data.Dson.Serializer,
                      Data.Dson.Octal,
                      Data.Dson.Lexer
   -- other-modules:       

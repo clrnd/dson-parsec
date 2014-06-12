@@ -5,7 +5,7 @@ import Data.Dson.Lexer
 import Control.Applicative
 import Data.Char (digitToInt, isOctDigit)
 import Data.Maybe (fromMaybe)
-import Text.Parsec (satisfy, char, spaces)
+import Text.Parsec (satisfy, char)
 import Text.Parsec.String (Parser)
 
 factor :: Parser Double
@@ -34,4 +34,4 @@ parseOctStrs  intPart decPart =
           expAndAdd (exp, acc) b = (pred exp, acc + (fromIntegral . digitToInt $ b) * (eight ** exp))
           eight = fromIntegral 8 :: Double
 
-octal = (*) <$> factor <*> (octalToDouble <$> octalParts) <* spaces
+octal = (*) <$> factor <*> (octalToDouble <$> octalParts)

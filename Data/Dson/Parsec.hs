@@ -17,7 +17,7 @@ dsonString :: Parser Dson
 dsonString = DSString <$> stringLiteral
 
 dsonInt :: Parser Dson
-dsonInt = DSNumber <$> octal
+dsonInt = DSNumber <$> octal <* spaces
 
 dsonBool :: Parser Dson
 dsonBool =     (symbol "yes"   *> pure Yes)

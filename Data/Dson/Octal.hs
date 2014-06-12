@@ -4,6 +4,7 @@ import Data.Dson.Lexer
 
 import Control.Applicative
 import Data.Char (digitToInt, isOctDigit)
+import Data.Maybe (fromMaybe)
 import Text.Parsec (satisfy, char, spaces)
 import Text.Parsec.String (Parser)
 
@@ -18,11 +19,11 @@ octalParts = (,,) <$> some octDigit <*> optional octalDecimals <*> optional octa
           veryVERY = symbol "very" <|> symbol "VERY"
 
 octalToDouble :: (String, Maybe String, Maybe (Double, String)) -> Double
-octalToDouble (intPart, Just decPart, Just (factor, exponent)) =
-    (parseOctStrs intPart decPart) ** (factor * (parseOctStrs exponent ""))
-octalToDouble (a, Nothing, Just b) = octalToDouble (a, Just "", Just b)
-octalToDouble (a, Just b, Nothing) = octalToDouble (a, Just b, Just (1, "1"))
-octalToDouble (a, Nothing, Nothing) = octalToDouble (a, Just "", Just (1, "1"))
+octalToDouble (int, m_dec, m_exp) = (parseOctStrs int dec) ** (sign * (parseOctStrs exp ""))
+    where sign_exp = fromMaybe (1, "1") m_exp
+          sign = fst sign_exp
+          exp = snd sign_exp
+          dec = fromMaybe "" m_dec
 
 -- Conversion according to http://en.wikipedia.org/wiki/Octal#Octal_to_decimal_conversion
 -- Decimal part has negative exponent.

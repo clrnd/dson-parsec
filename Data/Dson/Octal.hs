@@ -10,7 +10,7 @@ import Text.Parsec.String (Parser)
 
 octalToDouble :: (String, Maybe String, Maybe (Double, String)) -> Double
 octalToDouble (int, m_dec, m_exp) = (parseOctStrs int dec) * (8 ** (sign * (parseOctStrs exp "")))
-    where (sign, exp) = fromMaybe (1, "1") m_exp
+    where (sign, exp) = fromMaybe (1, "0") m_exp
           dec = fromMaybe "" m_dec
 
 -- Conversion according to http://en.wikipedia.org/wiki/Octal#Octal_to_decimal_conversion

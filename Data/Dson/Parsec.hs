@@ -1,3 +1,14 @@
+{-|
+Module      : Data.Dson.Parsec
+Copyright   : (c) Ezequiel Alvarez 2014
+License     : MIT
+Maintainer  : welcometothechango@gmail.com
+Stability   : provisional
+Portability : portable
+
+Provides the main DSON parser.
+-}
+
 module Data.Dson.Parsec (
     Dson(..),
     dsonTop
@@ -35,5 +46,6 @@ dsonDict = DSDict <$> (symbol "such" *> (kvPairs `sepBy` dictSep) <* symbol "wow
     where kvPairs = (,) <$> stringLiteral <*> (symbol "is" *> dsonValue)
           dictSep = oneOf ".,!?" <* spaces
 
+-- | This parser scans for either a DSON dict or array.
 dsonTop :: Parser Dson
 dsonTop = try dsonDict <|> dsonArray

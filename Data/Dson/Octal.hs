@@ -1,3 +1,14 @@
+{-|
+Module      : Data.Dson.Octal
+Copyright   : (c) Ezequiel Alvarez 2014
+License     : MIT
+Maintainer  : welcometothechango@gmail.com
+Stability   : provisional
+Portability : portable
+
+Parser for octal numbers.
+-}
+
 module Data.Dson.Octal (octal) where
 
 import Data.Dson.Lexer
@@ -31,5 +42,18 @@ octalParts = (,,) <$> some octDigit <*> optional octalDecimals <*> optional octa
           octalExponent = (,) <$> (veryVERY *> factor) <*> some octDigit
           veryVERY = symbol "very" <|> symbol "VERY"
 
+{-|
+  This parser can read a number in the following formats:
+
+  * 5
+
+  * -3.14
+
+  * 2very-6
+
+  * 1VERY4
+
+  etc
+-}
 octal :: Parser Double
 octal = (*) <$> factor <*> (octalToDouble <$> octalParts)

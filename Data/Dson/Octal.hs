@@ -8,10 +8,8 @@ import Data.Maybe (fromMaybe)
 import Text.Parsec (satisfy, char)
 import Text.Parsec.String (Parser)
 
-eight = fromIntegral 8 :: Double
-
 octalToDouble :: (String, Maybe String, Maybe (Double, String)) -> Double
-octalToDouble (int, m_dec, m_exp) = (parseOctStrs int dec) * (eight ** (sign * (parseOctStrs exp "")))
+octalToDouble (int, m_dec, m_exp) = (parseOctStrs int dec) * (8 ** (sign * (parseOctStrs exp "")))
     where (sign, exp) = fromMaybe (1, "1") m_exp
           dec = fromMaybe "" m_dec
 
@@ -21,7 +19,7 @@ parseOctStrs :: String -> String -> Double
 parseOctStrs  intPart decPart =
     snd $ foldl expAndAdd (initlLen, 0) (intPart ++ decPart)
     where initlLen = fromIntegral . pred . length $ intPart
-          expAndAdd (exp, acc) b = (pred exp, acc + (fromIntegral . digitToInt $ b) * (eight ** exp))
+          expAndAdd (exp, acc) b = (pred exp, acc + (fromIntegral . digitToInt $ b) * (8 ** exp))
 
 factor :: Parser Double
 factor = (char '-' *> pure (-1)) <|> (char '+' *> pure 1) <|> pure 1

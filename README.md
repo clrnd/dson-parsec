@@ -32,7 +32,7 @@ Prelude> import Data.Dson
 
 Prelude> main
 such "foo" is so "bar" also "baz" and 4.5 many wow
-"{ foo: ["bar", "baz", 4.625] }"
+"{ foo: [\"bar\", \"baz\", 4.625] }"
 ```
 
 The actual parser is parseTop in Parsec.

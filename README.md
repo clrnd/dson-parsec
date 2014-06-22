@@ -22,6 +22,14 @@ Curry would be proud.
 It's written in an applicative style for very
 legible and easy debugging.
 
+### So install
+
+You can install very ready with:
+
+```
+cabal install dson-parsec
+```
+
 ### Usage
 To get started, Dson implements a test that
 transforms very sexy DSON string into

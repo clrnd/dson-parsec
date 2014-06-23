@@ -21,5 +21,5 @@ library
                      Data.Dson.Serializer,
                      Data.Dson.Octal,
                      Data.Dson.Lexer
-  build-depends:     base >=4.4.*
+  build-depends:     base >=4.4.0
                    , parsec >=3.1
